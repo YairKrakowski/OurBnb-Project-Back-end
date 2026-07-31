@@ -1,0 +1,66 @@
+import { authService } from './auth.service.js'
+import { logger } from '../../services/logger.service.js'
+
+export async function login(req, res) {
+
+    if (!req.body) {
+        return res.status(400).send({ err: 'Missing request body' })
+    }
+
+    const { username, password } = req.body
+    try {
+        const user = await authService.login(username, password)
+        const loginToken = authService.getLoginToken(user)
+
+
+        res.cookie('loginToken', loginToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 1000 * 60 * 60 * 24 * 7
+        })
+
+        res.json(user)
+    } catch (err) {
+
+        logger.error('Failed to Login:', err)
+        res.status(401).send({ err: 'Failed to Login' })
+    }
+}
+
+export async function signup(req, res) {
+    try {
+        const credentials = req.body
+        const account = await authService.signup(credentials)
+        logger.debug(`auth.route - new account created: ${account.username}`)
+
+        const user = await authService.login(credentials.username, credentials.password)
+        logger.info('User signup:', user.username)
+
+        const loginToken = authService.getLoginToken(user)
+
+        res.cookie('loginToken', loginToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 1000 * 60 * 60 * 24 * 7
+        })
+
+        res.json(user)
+
+    } catch (err) {
+        logger.error('Failed to signup:', err)
+        // err may be a string (Promise.reject) or an Error object
+        const msg = typeof err === 'string' ? err : err.message || 'Failed to signup'
+        res.status(400).send({ err: msg })
+    }
+}
+
+export async function logout(req, res) {
+    try {
+        res.clearCookie('loginToken')
+        res.send({ msg: 'Logged out successfully' })
+    } catch (err) {
+        res.status(400).send({ err: 'Failed to logout' })
+    }
+}
