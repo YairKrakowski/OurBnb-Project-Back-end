@@ -17,13 +17,7 @@ npm start       # Production mode
 
 ## 📡 API Endpoints
 
-### Cars API
-- `GET /api/car` - Get all cars with optional filtering
-- `GET /api/car/:id` - Get car by ID
-- `POST /api/car` - Create new car
-- `PUT /api/car/:id` - Update car
-- `DELETE /api/car/:id` - Delete car
-- `POST /api/car/:id/msg` - Add message to car
+
 
 ### Users API
 - `POST /api/auth/signup` - Register new user
@@ -43,7 +37,7 @@ npm start       # Production mode
 api/
 ├── auth/         # Authentication routes and logic
 ├── user/         # User management
-├── car/          # Car CRUD operations
+
 └── review/       # Review system
 services/
 ├── db.service.js       # Database connectivity
@@ -57,19 +51,7 @@ middlewares/
 
 ## 💾 Database Schema
 
-### Car Collection
-```js
-{
-  vendor: String,
-  speed: Number,
-  owner: { type: ObjectId, ref: 'User' },
-  msgs: [{
-    id: String,
-    txt: String,
-    by: { _id, fullname }
-  }]
-}
-```
+
 
 ### User Collection
 ```js
@@ -77,17 +59,67 @@ middlewares/
   username: String,
   password: String,
   fullname: String,
+  imgUrl: String,
+  isAdmin: Boolean,
   score: Number,
   isAdmin: Boolean
 }
 ```
-
+### Stay Collection
+```js
+{
+  _id: ObjectId,
+  name: String,
+  host: {
+    _id: String,       
+    fullname: String,
+    imgUrl: String
+  },
+  loc: {
+    city: String,
+    lat: Number,
+    lng: Number
+  },
+  price: Number,
+  imgUrls: [String]
+}
+```
+### Order Collection
+```js
+{
+  _id: ObjectId,
+  hostId: String,
+  buyer: {
+    _id: String,
+    fullname: String
+  },
+  stay: {
+    _id: String,
+    name: String,
+    price: Number
+  },
+  startDate: String,
+  endDate: String,
+  guests: {
+    adults: Number,
+    children: Number,
+    infants: Number,
+    pets: Number
+  },
+  totalPrice: Number,
+  imgUrl: String,
+  status: String  // Kind of still unimplemented..
+}
+```
 ### Review Collection
 ```js
 {
+   byUserId: ObjectId,
+  targetType: String,
+  targetId: ObjectId,
   txt: String,
-  byUserId: ObjectId,
-  aboutUserId: ObjectId
+  rating: Number,
+  createdAt: Date
 }
 ```
 

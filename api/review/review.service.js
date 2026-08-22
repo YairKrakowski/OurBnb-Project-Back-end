@@ -134,18 +134,18 @@ function _buildCriteria(filterBy) {
         //     criteria.targetType = 'stay'
         // }
         if (filterBy.stayIds) {
-        const raw = Array.isArray(filterBy.stayIds)
-            ? filterBy.stayIds
-            : String(filterBy.stayIds).split(',')
-        const ids = raw
-            .map(id => id.trim())
-            .filter(id => /^[0-9a-fA-F]{24}$/.test(id))
-            .map(id => ObjectId.createFromHexString(id))
-        if (ids.length) {
-            criteria.targetId = { $in: ids }
-            criteria.targetType = 'stay'
+            const raw = Array.isArray(filterBy.stayIds)
+                ? filterBy.stayIds
+                : String(filterBy.stayIds).split(',')
+            const ids = raw
+                .map(id => id.trim())
+                .filter(id => /^[0-9a-fA-F]{24}$/.test(id))
+                .map(id => ObjectId.createFromHexString(id))
+            if (ids.length) {
+                criteria.targetId = { $in: ids }
+                criteria.targetType = 'stay'
+            }
         }
-    }
         if (filterBy.minPrice) {
             criteria.price = { $gte: +filterBy.minPrice }
         }
